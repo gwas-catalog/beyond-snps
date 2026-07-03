@@ -4,7 +4,7 @@ replicaCount: 1
 image:
   repository: dockerhub.ebi.ac.uk/gwas/gwas-beyond-snps
   tag: 1.0.0
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
 service:
   name: gwas-beyond-snps

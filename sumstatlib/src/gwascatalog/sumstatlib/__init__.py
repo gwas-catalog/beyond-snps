@@ -19,10 +19,10 @@ from gwascatalog.sumstatlib.sumstattable import (
 __all__ = [
     "CNVSumstatModel",
     "GeneSumstatModel",
+    "GenomeAssembly",
     "SumstatConfig",
     "SumstatError",
     "SumstatTable",
     "SumstatWriter",
     "ValidatedRow",
-    "GenomeAssembly",
 ]

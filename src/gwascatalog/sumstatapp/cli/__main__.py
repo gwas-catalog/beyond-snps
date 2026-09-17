@@ -62,7 +62,7 @@ class FileResult:
 # ── Worker ───────────────────────────────────────────────────
 
 
-def _get_model(variation_type: str) -> type[CNVSumstatModel] | type[GeneSumstatModel]:
+def _get_model(variation_type: str) -> type[CNVSumstatModel | GeneSumstatModel]:
     """Return the Pydantic model class for the given variation type."""
     match variation_type:
         case "CNV":
@@ -166,7 +166,7 @@ def validate_file(
             fatal_error=None,
         )
 
-    except Exception as exc:  # noqa: BLE001 — report all failures back to the caller
+    except Exception as exc:
         elapsed = time.monotonic() - start
         logger.debug("Fatal error validating %s", inp.name, exc_info=True)
         return FileResult(

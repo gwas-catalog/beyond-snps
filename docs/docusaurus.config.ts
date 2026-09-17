@@ -20,10 +20,10 @@ const config: Config = {
   },
 
   // Set the production url of your site here
-  url: 'https://ebi.ac.uk/',
+  url: 'https://www.ebi.ac.uk',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: isDev ? '/' : '/gwas/apps/beyond-snps',
+  baseUrl: isDev ? '/' : '/gwas/apps/beyond-snps/',
 
   onBrokenLinks: 'throw',
 

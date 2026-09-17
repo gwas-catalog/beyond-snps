@@ -1,0 +1,70 @@
+stages:
+  - test
+  - build
+  - deploy
+
+default:
+  tags:
+    - gwas
+
+workflow:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_COMMIT_BRANCH == "dev"'
+
+test:
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:3.13
+  stage: test
+  before_script:
+    - pip install uv
+  script:
+    - uv run nox -s lint tests
+
+build_pages:
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/node:22-bookworm
+  stage: build
+  before_script:
+    - apt-get update
+    - apt-get install --yes --no-install-recommends python3 curl ca-certificates
+    - curl -LsSf https://astral.sh/uv/install.sh | sh
+    - export PATH="$HOME/.local/bin:$PATH"
+    - npm ci --prefix docs
+  script:
+    - export PATH="$HOME/.local/bin:$PATH"
+    - npm run build --prefix docs
+    - mkdir public
+    - cp -a docs/build/. public/
+  artifacts:
+    paths:
+      - public/
+
+.pages:
+  stage: deploy
+  needs:
+    - job: test
+      artifacts: false
+    - job: build_pages
+      artifacts: true
+  pages:
+    publish: public
+    expire_in: never
+
+pages:
+  extends: .pages
+  resource_group: pages-production
+  environment:
+    name: production
+    url: $CI_PAGES_URL
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+pages_dev:
+  extends: .pages
+  pages:
+    path_prefix: dev
+  resource_group: pages-development
+  environment:
+    name: development
+    deployment_tier: development
+    url: $CI_PAGES_URL
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev" && $CI_COMMIT_REF_PROTECTED == "true"'

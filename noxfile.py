@@ -5,8 +5,6 @@
 
 from __future__ import annotations
 
-import os
-
 import nox
 
 # Use uv for environment creation and package installation
@@ -103,40 +101,6 @@ def build_wheel(session: nox.Session) -> None:
 def publish_pypi(session: nox.Session) -> None:
     """Publish built wheels in dist/ to PyPI using uv trusted publishing."""
     session.run("uv", "publish", external=True)
-
-
-@nox.session(venv_backend="none")
-def build_docs_image(session: nox.Session) -> None:
-    """Build the documentation Docker image and save it as a tarball.
-
-    Usage:  nox -s build_docs_image -- <version>
-    Produces: dist/docs-image-<version>.tar
-    """
-    if not session.posargs:
-        session.error("Specify a version, e.g.: nox -s build_docs_image -- 1.2.3")
-
-    DOCKER_DOCS_IMAGE_NAME = "dockerhub.ebi.ac.uk/gwas/gwas-beyond-snps"
-    version = session.posargs[0]
-    docker_tag = f"{DOCKER_DOCS_IMAGE_NAME}:{version}"
-
-    # IMPORTANT
-    # ancient K8S clusters only support legacy media types,
-    # so we disable BuildKit's OCI media types to ensure compatibility
-    os.environ["BUILDKIT_OCI_MEDIA_TYPES"] = "0"
-    session.run(
-        "docker",
-        "build",
-        "--platform",
-        "linux/amd64,linux/arm64",
-        "--provenance=false",
-        "-f",
-        "deployment/Dockerfile",
-        "-t",
-        docker_tag,
-        ".",
-        "--push",
-        external=True,
-    )
 
 
 if __name__ == "__main__":

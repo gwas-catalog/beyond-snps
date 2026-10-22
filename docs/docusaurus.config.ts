@@ -5,7 +5,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 // NODE_ENV is always 'production' during `docusaurus build`, so use DEPLOY_ENV
-// to distinguish a dev/Cloudflare Pages build from a production build.
+// to distinguish a local preview from an EBI deployment build.
 // `docusaurus start` sets NODE_ENV=development, so fall back to that for local dev.
 const isDev = process.env.DEPLOY_ENV === 'development' || process.env.NODE_ENV !== 'production';
 
@@ -20,7 +20,7 @@ const config: Config = {
   },
 
   // Set the production url of your site here
-  url: 'https://www.ebi.ac.uk',
+  url: process.env.DOCUSAURUS_URL ?? 'https://www.ebi.ac.uk',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: isDev ? '/' : '/gwas/apps/beyond-snps/',

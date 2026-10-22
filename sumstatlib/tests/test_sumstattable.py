@@ -94,11 +94,9 @@ def test_cnv_sumstat(cnv_sumstat_file, cnv_n_rows, important_cnv_fields, tmp_pat
 
 
 CNV_CONFIG = SumstatConfig(
-    **{
-        "primary_effect_size": "beta",
-        "allow_zero_p_values": False,
-        "assembly": GenomeAssembly.GRCH38,
-    }
+    primary_effect_size="beta",
+    allow_zero_p_values=False,
+    assembly=GenomeAssembly.GRCH38,
 )
 
 

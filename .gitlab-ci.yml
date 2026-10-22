@@ -1,0 +1,85 @@
+stages:
+  - test
+  - build
+  - deploy
+
+default:
+  tags:
+    - gwas
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS && $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_COMMIT_BRANCH != "dev"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+
+test:
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:3.13
+  stage: test
+  rules:
+    - when: on_success
+  before_script:
+    - pip install uv
+  script:
+    - uvx nox -s lint tests
+
+build_pages:
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/node:22-bookworm
+  stage: build
+  variables:
+    DOCUSAURUS_URL: https://www.ebi.ac.uk
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev" || $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "dev"'
+      variables:
+        DOCUSAURUS_URL: https://wwwdev.ebi.ac.uk
+    - when: on_success
+  before_script:
+    - apt-get update
+    - apt-get install --yes --no-install-recommends python3 curl ca-certificates
+    - curl -LsSf https://astral.sh/uv/install.sh | sh
+    - export PATH="$HOME/.local/bin:$PATH"
+    - npm ci --prefix docs
+  script:
+    - export PATH="$HOME/.local/bin:$PATH"
+    - npm run build --prefix docs
+    - mkdir public
+    - cp -a docs/build/. public/
+  artifacts:
+    paths:
+      - public/
+
+.pages:
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/node:22-bookworm
+  stage: deploy
+  needs:
+    - job: test
+      artifacts: false
+    - job: build_pages
+      artifacts: true
+  script:
+    - echo "Publishing Beyond SNPs to $CI_ENVIRONMENT_URL"
+  pages:
+    publish: public
+    expire_in: never
+
+pages:
+  extends: .pages
+  resource_group: pages-production
+  environment:
+    name: production
+    url: https://www.ebi.ac.uk/gwas/apps/beyond-snps/
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+pages_dev:
+  extends: .pages
+  pages:
+    path_prefix: dev
+  resource_group: pages-development
+  environment:
+    name: development
+    deployment_tier: development
+    url: https://wwwdev.ebi.ac.uk/gwas/apps/beyond-snps/
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev" && $CI_COMMIT_REF_PROTECTED == "true"'

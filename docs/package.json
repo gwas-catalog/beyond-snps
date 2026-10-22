@@ -8,7 +8,7 @@
     "start": "docusaurus start",
     "prebuild:dev": "uv run ../src/gwascatalog/sumstatapp/web/build.py --copy-to ./static/validate --base-path /validate",
     "build:dev": "DEPLOY_ENV=development docusaurus build",
-    "prebuild": "uv run ../src/gwascatalog/sumstatapp/web/build.py --copy-to ./static/validate --base-path /gwas/apps/beyond-snps/validate",
+    "prebuild": "uv run ../src/gwascatalog/sumstatapp/web/build.py --copy-to ./static/validate --base-path /gwas/apps/beyond-snps/validate/",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",

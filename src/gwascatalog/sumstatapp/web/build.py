@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Build script for the GWAS Catalog web validator.
 
@@ -44,7 +43,7 @@ def build_wheel() -> Path:
         print("❌ No wheel found in dist/", file=sys.stderr)
         sys.exit(1)
 
-    wheel = sorted(wheels)[-1]  # latest by name
+    wheel = max(wheels)  # latest by name
     print(f"   Built: {wheel.name}")
     return wheel
 

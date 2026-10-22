@@ -31,7 +31,7 @@ flowchart TD
 
     validation_choice{How should I validate my files?}
 
-    web_validator[Use the web interface at ebi.ac.uk/gwas/apps/beyond-snps]
+    web_validator[Use the web interface at www.ebi.ac.uk/gwas/apps/beyond-snps/]
     cli_validator[Use the CLI at github.com/ebispot/gwas-pysumstats]
 
     cnvs --> validation_choice

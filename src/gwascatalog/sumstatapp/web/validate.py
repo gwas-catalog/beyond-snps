@@ -95,7 +95,7 @@ def _post_progress(
 
 def _get_model_class(
     variation_type: str,
-) -> type[CNVSumstatModel] | type[GeneSumstatModel]:
+) -> type[CNVSumstatModel | GeneSumstatModel]:
     """Return the correct Pydantic model class for the variation type."""
     match variation_type:
         case "CNV":

@@ -5,17 +5,7 @@ on:
   push:
     branches:
       - "**"
-    paths:
-      - "**.py"
-      - "pyproject.toml"
-      - "uv.lock"
-      - "noxfile.py"
   pull_request:
-    paths:
-      - "**.py"
-      - "pyproject.toml"
-      - "uv.lock"
-      - "noxfile.py"
   workflow_call:
 
 jobs:
@@ -41,8 +31,19 @@ jobs:
         with:
           enable-cache: true
 
-      - name: Install nox
-        run: uv venv && uv pip install nox
-
       - name: Run Nox (fail fast)
-        run: uv tool run nox
+        run: uvx nox -s lint tests
+
+  # GitLab mirror pipelines run after pushes to protected branches.
+  # Build the docs and web app here to catch failures before a GitHub PR merges.
+  # This job checks the build only. GitLab publishes the site.
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: astral-sh/setup-uv@v7
+      - run: npm ci --prefix docs
+      - run: npm run build --prefix docs

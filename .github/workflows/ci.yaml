@@ -34,6 +34,9 @@ jobs:
       - name: Run Nox (fail fast)
         run: uvx nox -s lint tests
 
+  # GitLab mirror pipelines run after pushes to protected branches.
+  # Build the docs and web app here to catch failures before a GitHub PR merges.
+  # This job checks the build only. GitLab publishes the site.
   docs:
     runs-on: ubuntu-latest
     steps:
